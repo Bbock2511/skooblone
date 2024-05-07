@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "skooblone",
+    "name": "Lendo no Vagão",
     "slug": "skooblone",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,12 +19,27 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/Logo.png",
+        "backgroundColor": "#E8D49E"
+      },
+      "package": "com.lendonovagao.skooblone"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/Logo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "02d2643c-3702-46d5-b980-bcb8b63006fb"
+      }
+    },
+    "plugins": [
+      ["expo-font",
+      {
+        "assets": [
+          "./assets/fonts/DancingScript-Bold.ttf"
+        ]
+      }
+      ]
+    ]
   }
 }

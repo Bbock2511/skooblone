@@ -1,69 +1,90 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, ActivityIndicator, Image } from 'react-native'
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    TextInput,
+    Alert,
+    ActivityIndicator,
+    Image,
+} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Constants from 'expo-constants'
-import { Controller, useForm } from 'react-hook-form';
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { app } from '../../../services/firebaseConfig';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUserAction } from '../../../redux/actions';
-import { setUserLoadingAction } from '../../../redux/actions';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Controller, useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { app } from '../../../services/firebaseConfig'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserAction } from '../../../redux/actions'
+import { setUserLoadingAction } from '../../../redux/actions'
+import { MaterialIcons } from '@expo/vector-icons'
 
-import * as Font from 'expo-font';
+import * as Font from 'expo-font'
+import changePassword from '../../functions/changePassword'
 
-const STATUSBAR_HEIGHT = Constants.statusBarHeight;
+const STATUSBAR_HEIGHT = Constants.statusBarHeight
 
-const auth = getAuth(app);
+const auth = getAuth(app)
 
 const schema = yup.object({
-    email: yup.string().email("Email inválido").required("Email é obrigatório"),
-    password: yup.string().min(6, "A senha deve conter no mínimo 6 dígitos").required("Informe a senha"),
+    email: yup.string().email('Email inválido').required('Email é obrigatório'),
+    password: yup
+        .string()
+        .min(6, 'A senha deve conter no mínimo 6 dígitos')
+        .required('Informe a senha'),
 })
 
 const Login = ({ navigation }) => {
+    const [fontLoaded, setFontLoaded] = useState(false)
 
-    const [ fontLoaded, setFontLoaded ] = useState(false)
+    const [email, setEmail] = useState('')
 
-    const { control, handleSubmit, formState: { errors } } = useForm({
-        resolver: yupResolver(schema)
-    });
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+    })
 
     const [showPassword, setShowPassword] = useState(false)
 
     const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
+        setShowPassword(!showPassword)
+    }
 
-    const {userLoading} = useSelector(state => state.user)
+    const { userLoading } = useSelector((state) => state.user)
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch()
 
     const onSubmit = (data) => {
         setUserLoadingAction(true, dispatch)
         signInWithEmailAndPassword(auth, data.email, data.password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const { email, uid } = user;
-            setUserAction({ email, uid }, dispatch);
-            
-        }).catch((error) => {
-            if (error.code == 'auth/user-not-found') {
-                Alert.alert('Usuário não encontrado');
-            } else if (error.code === 'auth/invalid-credential') {
-                Alert.alert('Credencais inválidas', 'Verifique se o email e senha estão corretos');
-            }
-        })
-        .finally(() => {
-            setUserLoadingAction(false, dispatch)
-        })
-    };
+            .then((userCredential) => {
+                const user = userCredential.user
+                const { email, uid } = user
+                setUserAction({ email, uid }, dispatch)
+            })
+            .catch((error) => {
+                if (error.code == 'auth/user-not-found') {
+                    Alert.alert('Usuário não encontrado')
+                } else if (error.code === 'auth/invalid-credential') {
+                    Alert.alert(
+                        'Credencais inválidas',
+                        'Verifique se o email e senha estão corretos'
+                    )
+                }
+            })
+            .finally(() => {
+                setUserLoadingAction(false, dispatch)
+            })
+    }
 
     useEffect(() => {
         const loadFonts = async () => {
             await Font.loadAsync({
-                'Dancing-Script-Bold': require('../../../assets/fonts/DancingScript-Bold.ttf')
+                'Dancing-Script-Bold': require('../../../assets/fonts/DancingScript-Bold.ttf'),
             })
             setFontLoaded(true)
         }
@@ -72,80 +93,143 @@ const Login = ({ navigation }) => {
     }, [])
 
     if (!fontLoaded) {
-        return null;
+        return null
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <Image source={require('../../../assets/Logo.png')} style={{width: 80, height: 80, alignSelf: 'center'}} />
+                <Image
+                    source={require('../../../assets/Logo.png')}
+                    style={{ width: 80, height: 80, alignSelf: 'center' }}
+                />
                 <Text style={styles.title}>Lendo no Vagão</Text>
 
                 <Controller
-                        control={control}
-                        name="email"
-                        render={({ field: { onChange, onBlur, value } }) => (
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
-                            style={[styles.input, {borderColor: errors.email && 'red'}]}
+                            style={[
+                                styles.input,
+                                { borderColor: errors.email && 'red' },
+                            ]}
                             placeholder="Email"
                             onBlur={onBlur}
-                            onChangeText={onChange}
+                            onChangeText={(text) => {
+                                setEmail(text)
+                                onChange(text)
+                            }}
                             value={value}
                         />
-                        )}
-                    />
-                    {errors.email && <Text
-                    style={{
-                        alignSelf: 'center',
-                        color: 'red'
-                    }}
+                    )}
+                />
+                {errors.email && (
+                    <Text
+                        style={{
+                            alignSelf: 'center',
+                            color: 'red',
+                        }}
                     >
                         {errors.email?.message}
-                    </Text>}
+                    </Text>
+                )}
 
-                    <Controller
-                        control={control}
-                        name="password"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <View style={[styles.passwordContainer, {borderColor: errors.password ? 'red' : 'black'}]}>
-                                <TextInput
-                                    style={{height: '100%', width: '88%', padding: 10,}}
-                                    placeholder="Senha"
-                                    onBlur={onBlur}
-                                    onChangeText={onChange}
-                                    value={value}
-                                    secureTextEntry={!showPassword} // Use secureTextEntry com base no estado showPassword
+                <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <View
+                            style={[
+                                styles.passwordContainer,
+                                {
+                                    borderColor: errors.password
+                                        ? 'red'
+                                        : 'black',
+                                },
+                            ]}
+                        >
+                            <TextInput
+                                style={{
+                                    height: '100%',
+                                    width: '88%',
+                                    padding: 10,
+                                }}
+                                placeholder="Senha"
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                secureTextEntry={!showPassword} // Use secureTextEntry com base no estado showPassword
+                            />
+                            <TouchableOpacity
+                                style={{
+                                    height: '100%',
+                                    justifyContent: 'center',
+                                    borderTopEndRadius: 15,
+                                    borderBottomEndRadius: 15,
+                                    paddingEnd: 5,
+                                }}
+                                onPress={toggleShowPassword}
+                            >
+                                <MaterialIcons
+                                    name={
+                                        showPassword
+                                            ? 'visibility-off'
+                                            : 'visibility'
+                                    } // Alterne entre os ícones de mostrar e ocultar
+                                    size={22}
+                                    color={showPassword ? 'gray' : 'black'} // Altere a cor do ícone com base no estado showPassword
                                 />
-                                <TouchableOpacity style={{height: '100%', justifyContent: 'center', borderTopEndRadius: 15, borderBottomEndRadius: 15, paddingEnd: 5}} onPress={toggleShowPassword}>
-                                    <MaterialIcons
-                                        name={showPassword ? 'visibility-off' : 'visibility'} // Alterne entre os ícones de mostrar e ocultar
-                                        size={22}
-                                        color={showPassword ? 'gray' : 'black'} // Altere a cor do ícone com base no estado showPassword
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    />
-                    {errors.password && <Text 
-                    style={{
-                        alignSelf: 'center',
-                        color: 'red'
-                    }}>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                />
+                {errors.password && (
+                    <Text
+                        style={{
+                            alignSelf: 'center',
+                            color: 'red',
+                        }}
+                    >
                         {errors.password?.message}
-                    </Text>}
+                    </Text>
+                )}
 
-                {userLoading ? 
-                <View style={styles.loadingComponent}>
-                    <ActivityIndicator size={'small'} color={'tomato'}/>
-                </View>
-                : 
-                <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.submitButton}>
-                    <Text style={{color: "#F9F9F9"}}>Entrar</Text>
+                <TouchableOpacity onPress={() => changePassword(auth, email)}>
+                    <Text
+                        style={{
+                            color: '#517EF5',
+                            textDecorationLine: 'underline',
+                            marginTop: 5,
+                        }}
+                    >
+                        Esqueci minha senha
+                    </Text>
                 </TouchableOpacity>
-                }
-                
+
+                {userLoading ? (
+                    <View style={styles.loadingComponent}>
+                        <ActivityIndicator size={'small'} color={'tomato'} />
+                    </View>
+                ) : (
+                    <TouchableOpacity
+                        onPress={handleSubmit(onSubmit)}
+                        style={styles.submitButton}
+                    >
+                        <Text style={{ color: '#F9F9F9' }}>Entrar</Text>
+                    </TouchableOpacity>
+                )}
+
                 <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                    <Text style={{color: '#517EF5', textDecorationLine: 'underline', marginTop: 5}}>Não possuo conta</Text>
+                    <Text
+                        style={{
+                            color: '#517EF5',
+                            textDecorationLine: 'underline',
+                            marginTop: 5,
+                        }}
+                    >
+                        Não possuo conta
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -157,7 +241,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#E8D49E'
+        backgroundColor: '#E8D49E',
     },
     card: {
         paddingTop: 40,
@@ -168,17 +252,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         elevation: 20,
         shadowColor: 'black',
-        shadowOffset: {width: 0, height: 2},
-        alignItems: 'center'
+        shadowOffset: { width: 0, height: 2 },
+        alignItems: 'center',
     },
     title: {
         fontSize: 32,
         fontFamily: 'Dancing-Script-Bold',
         marginBottom: 15,
-        color: 'tomato'
+        color: 'tomato',
+        width: '100%',
+        textAlign: 'center',
     },
     input: {
-        height: 40,
+        height: 50,
         width: '70%',
         borderRadius: 15,
         marginTop: 10,
@@ -200,7 +286,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
         alignSelf: 'center',
         backgroundColor: '#FF634750',
-        borderRadius: 20
+        borderRadius: 20,
     },
     passwordContainer: {
         flexDirection: 'row',
@@ -211,7 +297,7 @@ const styles = StyleSheet.create({
         width: '70%',
         justifyContent: 'space-between',
         borderRadius: 15,
-        height: 40,
+        height: 50,
         marginTop: 10,
     },
 })

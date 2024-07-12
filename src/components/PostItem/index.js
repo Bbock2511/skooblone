@@ -75,7 +75,8 @@ const styles = StyleSheet.create({
         gap: 10,
         marginBottom: 10,
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        maxWidth: '90%'
     },
     myFeedFalse: {
         marginBottom: 10

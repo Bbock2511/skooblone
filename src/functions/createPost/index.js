@@ -1,7 +1,6 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore"
-import { db } from "../../../services/firebaseConfig"
-import { ToastAndroid } from "react-native"
-
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { db } from '../../../services/firebaseConfig'
+import { ToastAndroid } from 'react-native'
 
 const createPost = async (book, userName, postBody) => {
     const postRef = collection(db, 'posts')
@@ -19,7 +18,7 @@ const createPost = async (book, userName, postBody) => {
         await addDoc(postRef, post)
         ToastAndroid.show('Post criado com sucesso', ToastAndroid.SHORT)
     } catch (error) {
-        ToastAndroid.show('Erro ao criar post', ToastAndroid.SHORT)
+        ToastAndroid.show('Erro ao criar post' + error, ToastAndroid.SHORT)
     }
 }
 

@@ -12,10 +12,10 @@ import Search from '../screens/Search';
 import Profile from '../screens/Profile';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../../redux/slices/user';
-import fetchUsername from '../functions/fetchUsername';
-import { setUserNameAction } from '../../redux/actions';
+import { useSelector } from 'react-redux';
+import AgendaScreen from '../screens/AgendaScreen';
+import SplashScreen from '../screens/SplashScreen';
+
 
 LogBox.ignoreAllLogs();
 
@@ -31,6 +31,7 @@ const Routes = () => {
     return(
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Signup" component={Signup} />
         </Stack.Navigator>
@@ -69,6 +70,8 @@ const TabRoutes = () => {
                 iconName = focused ? 'search' : 'search-outline';
                 } else if (route.name === 'Profile') {
                 iconName = focused ? 'person' : 'person-outline';
+                } else if (route.name === 'Agenda') {
+                iconName = focused ? 'calendar' : 'calendar-outline';
                 }
 
                 return <Ionicons name={iconName} size={size} color={color} />;
@@ -78,6 +81,7 @@ const TabRoutes = () => {
       >
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Search" component={Search} />
+        <Tab.Screen name='Agenda' component={AgendaScreen} />
         <Tab.Screen name="Profile" component={Profile} />
       </Tab.Navigator>
   );

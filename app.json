@@ -33,12 +33,19 @@
       }
     },
     "plugins": [
-      ["expo-font",
-      {
-        "assets": [
-          "./assets/fonts/DancingScript-Bold.ttf"
-        ]
-      }
+      [
+        "expo-font",
+        {
+          "assets": [
+            "./assets/fonts/DancingScript-Bold.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
       ]
     ]
   }

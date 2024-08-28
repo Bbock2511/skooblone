@@ -18,6 +18,9 @@
       "supportsTablet": true
     },
     "android": {
+      "notification": {
+        "icon": "./assets/Logo.png"
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/Logo.png",
         "backgroundColor": "#E8D49E"
@@ -50,7 +53,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./local/assets/notification-icon.png",
+          "icon": "./assets/Logo.png",
           "color": "#E8D49E",
           "defaultChannel": "default"
         }

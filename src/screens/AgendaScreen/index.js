@@ -14,9 +14,6 @@ import AddBookAgendaModal from "../../components/AddBookAgendaModal";
 import getEventsFromAsyncStorage from "../../functions/getEventsFromAsyncStorage";
 import { useSelector } from "react-redux";
 
-import * as Permissions from "expo-permissions";
-import * as Notifications from "expo-notifications";
-
 const STATUS_BAR_HEIGHT = Constants.statusBarHeight;
 
 // Notifications.setNotificationHandler({

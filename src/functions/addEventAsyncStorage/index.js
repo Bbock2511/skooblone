@@ -4,6 +4,7 @@ import getEventsFromAsyncStorage from '../getEventsFromAsyncStorage'
 import * as Notifications from "expo-notifications";
 import sortearFrase from '../sortPhrase';
 import requestPermissions from '../requestNotificationPermission';
+import XDate from 'xdate';
 
 const verifyIfEventExists = (value, savedEvents, selectedDay) => {
 
@@ -26,12 +27,16 @@ const scheduleNotification = async (day, book) => {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
 
+    const date = new Date(day);
+
+    date.setHours(9, 0, 0, 0);
+
     await Notifications.scheduleNotificationAsync({
         content: {
             title: `Horário de leitura de ${book.title}`,
             body: `${fraseSorteada.frase}`,
         },
-        trigger: { seconds: 5 },
+        trigger: date,
     });
 };
 

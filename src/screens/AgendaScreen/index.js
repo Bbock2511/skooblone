@@ -7,12 +7,13 @@ import {
   View,
 } from "react-native";
 import { Agenda, LocaleConfig } from "react-native-calendars";
+import XDate from "xdate";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
-import XDate from "xdate";
 import AddBookAgendaModal from "../../components/AddBookAgendaModal";
 import getEventsFromAsyncStorage from "../../functions/getEventsFromAsyncStorage";
 import { useSelector } from "react-redux";
+import { date } from "yup";
 
 const STATUS_BAR_HEIGHT = Constants.statusBarHeight;
 
@@ -78,6 +79,7 @@ const AgendaScreen = () => {
   const [events, setEvents] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [refreshingModal, setRefreshingModal] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const handleShowModal = () => {
     setShowModal(false);
@@ -86,6 +88,7 @@ const AgendaScreen = () => {
   const getEvents = async () => {
     getEventsFromAsyncStorage(userName).then((events) => {
       setEvents(convertToAgendaFormat(events));
+      setLoaded(true);
     });
   };
 
@@ -100,75 +103,80 @@ const AgendaScreen = () => {
       if (!formattedEvents[event.date]) {
         formattedEvents[event.date] = [];
       }
-      formattedEvents[event.date].push({
+      const eventObj = {
         id: event.id,
+        date: event.date,
         name: event.title,
-      });
+      };
+      formattedEvents[event.date].push(eventObj);
+
     });
     return formattedEvents;
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Agenda
-        onDayPress={(day) => setSelectedDate(day.dateString)}
-        selected={selectedDate}
-        calendarStyle={{
-          backgroundColor: "#E8D49E",
-          elevation: 5,
-        }}
-        theme={{
-          backgroundColor: "#E8D49E",
-          calendarBackground: "#E8D49E",
-          textSectionTitleColor: "tomato",
-          selectedDayBackgroundColor: "tomato",
-          todayTextColor: "tomato",
-          dayTextColor: "black",
-          agendaDayNumColor: "tomato",
-          agendaDayTextColor: "black",
-          agendaTodayColor: "black",
-          agendaKnobColor: "tomato",
-          dotColor: "tomato",
-        }}
-        items={events}
-        renderItem={(item) => {
-          return (
-            <View
+      {loaded ? (
+        <SafeAreaView style={styles.container}>
+          <Agenda
+            onDayPress={(day) => setSelectedDate(day.dateString)}
+            selected={selectedDate}
+            calendarStyle={{
+              backgroundColor: "#E8D49E",
+              elevation: 5,
+            }}
+            theme={{
+              backgroundColor: "#E8D49E",
+              calendarBackground: "#E8D49E",
+              textSectionTitleColor: "tomato",
+              selectedDayBackgroundColor: "tomato",
+              todayTextColor: "tomato",
+              dayTextColor: "black",
+              agendaDayNumColor: "tomato",
+              agendaDayTextColor: "black",
+              agendaTodayColor: "black",
+              agendaKnobColor: "tomato",
+              dotColor: "tomato",
+            }}
+            items={events}
+            renderItem={(item) => {
+              return (
+                <View style={styles.eventContainer}>
+                  <Text style={styles.eventText} onPress={() => console.log(item)}>{item.name || 'Nada'}</Text>
+                </View>
+              );
+            }}
+            renderEmptyData={() => {
+              return (
+                <View>
+                  <Text>Nenhum evento para este dia</Text>
+                </View>
+              );
+            }}
+            initialNumToRender={10}
+            showOnlySelectedDayItems={true}
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setShowModal(true)}
+          >
+            <Text
               style={{
-                flex: 1,
-                alignContent: "center",
-                justifyContent: "center",
+                fontSize: 32,
+                textAlign: "center",
+                textAlignVertical: "center",
+                color: "#efefef",
               }}
             >
-              <Text>
-                {item.name == undefined ? (item.name = "Nada") : item.name}
-              </Text>
-            </View>
-          );
-        }}
-        renderEmptyData={() => {
-          return (
-            <View>
-              <Text>Nenhum evento para este dia</Text>
-            </View>
-          );
-        }}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => setShowModal(true)}
-      >
-        <Text
-          style={{
-            fontSize: 32,
-            textAlign: "center",
-            textAlignVertical: "center",
-            color: "#efefef",
-          }}
-        >
-          +
-        </Text>
-      </TouchableOpacity>
+              +
+            </Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      ) : (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ textAlign: 'center' }}>Carregando...</Text>
+        </View>
+      )}
 
       <AddBookAgendaModal
         show={showModal}
@@ -198,6 +206,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,
+  },
+  eventContainer: {
+    justifyContent: 'center',
+    alignContent: 'center',
+    padding: 10,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    elevation: 2,
+  },
+  eventText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 export default AgendaScreen;
